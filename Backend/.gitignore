@@ -1,0 +1,15 @@
+# ignore repos folder
+repos/
+
+# ignore virtual environment
+venv/
+
+# ignore env file
+.env
+
+# ignore cache
+__pycache__/
+
+# IDE folders
+.vscode/
+.idea/
