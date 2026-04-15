@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, HttpUrl
 from service.repo_service import clone_repo
@@ -10,6 +12,8 @@ from utils.content_utils import get_imp_file_content
 from utils.build_chat_prompt import build_chat_prompt
 from utils.selected_file_content import selected_file_content
 from utils.store_chat_history import store_chat_history
+from dotenv import load_dotenv
+from fastapi.responses import RedirectResponse
 app = FastAPI()
 
 class RepoRequest(BaseModel):
@@ -19,6 +23,9 @@ class ChatRequest(BaseModel):
     repo_name: str
     user_query: str
     selected_files:list[str] = None
+
+load_dotenv()
+CLIENT_ID = os.getenv("CLIENT_ID")
 REPO_PATH=""
 @app.post("/analyze")
 async def analyze_github_repo(data: RepoRequest):
@@ -75,3 +82,56 @@ async def chat_with_repo(data: ChatRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.get("/auth/github/login")
+async def github_login():
+    github_url=(
+    f"https://github.com/login/oauth/authorize"
+    f"?client_id={CLIENT_ID}&scope=repo"
+    )
+    return RedirectResponse(github_url)
+
+import requests
+
+CLIENT_SECRET = "09d1fd8afff00e9d24ebec5043a895cc48fae3ad"
+
+@app.get("/auth/github/callback")
+def github_callback(code: str):
+    token_url = "https://github.com/login/oauth/access_token"
+
+    response = requests.post(
+        token_url,
+        headers={"Accept": "application/json"},
+        data={
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "code": code,
+        },
+    )
+
+    print(response.json())  # 👈 ADD THIS
+
+    return response.json()
+
+@app.get("/repos")
+def get_all_repos(token: str):
+    all_repos = []
+    page = 1
+
+    while True:
+        response = requests.get(
+            "https://api.github.com/user/repos",
+            headers={"Authorization": f"Bearer {token}"},
+            params={"per_page": 100, "page": page}
+        )
+
+        data = response.json()
+
+        if not data:
+            break
+
+        all_repos.extend(data)
+        page += 1
+
+    return all_repos
