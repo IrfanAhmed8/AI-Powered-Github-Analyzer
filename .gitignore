@@ -1,0 +1,5 @@
+#ignore venv,repos,.env,_pycache from backend
+venv/
+repos/
+.env
+__pycache__/

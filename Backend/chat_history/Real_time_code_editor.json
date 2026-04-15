@@ -1,0 +1,6 @@
+[
+    {
+        "user_query": "how socket works",
+        "response": "The client initializes a connection via `socket.io-client` using WebSockets to the backend URL. The server creates a `socket.io` instance attached to an HTTP server, managing cross-origin requests. It tracks users in `userSocketMap` and facilitates real-time communication through defined `ACTIONS` like `JOIN` and `CODE_CHANGE` within rooms."
+    }
+]

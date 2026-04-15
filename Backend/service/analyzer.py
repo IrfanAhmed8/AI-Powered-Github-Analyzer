@@ -1,8 +1,8 @@
 import os
 import json
-from .language_utils import language_percentage, main_language,map_extension_to_language
-from .code_complexity import code_complexity,file_complexity
-from .project_type_utils import detect_project_type, project_dependencies
+from utils.language_utils import language_percentage, main_language,map_extension_to_language
+from utils.code_complexity import code_complexity,file_complexity
+from utils.project_type_utils import detect_project_type, project_dependencies
 
 
 
