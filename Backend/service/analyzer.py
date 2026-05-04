@@ -3,10 +3,11 @@ import json
 from utils.language_utils import language_percentage, main_language,map_extension_to_language
 from utils.code_complexity import code_complexity,file_complexity
 from utils.project_type_utils import detect_project_type, project_dependencies
-
+from utils.embed_chunks import embed_chunks
 
 
 def directory_traverse(path):
+    
     #list all files and directories in the given path
     items = []
     files_count_with_extensions = {".py": 0, ".js": 0, ".java": 0, ".jsx": 0, ".cpp": 0, ".c": 0, ".rb": 0, ".go": 0, ".ts": 0,".md": 0,".css": 0,".html": 0 }

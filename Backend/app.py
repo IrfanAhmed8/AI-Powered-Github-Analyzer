@@ -12,10 +12,23 @@ from utils.content_utils import get_imp_file_content
 from utils.build_chat_prompt import build_chat_prompt
 from utils.selected_file_content import selected_file_content
 from utils.store_chat_history import store_chat_history
+from service.create_chunk import create_chunk
 from dotenv import load_dotenv
 from fastapi.responses import RedirectResponse
-app = FastAPI()
+from utils.embed_chunks import embed_chunks
+from utils.search_chunk import search_chunks
+from utils.clean_search_response import clean_chunks
+from fastapi.middleware.cors import CORSMiddleware
 
+
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # your Vite frontend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class RepoRequest(BaseModel):
     repo_url: HttpUrl
 
@@ -27,6 +40,7 @@ class ChatRequest(BaseModel):
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
 REPO_PATH=""
+FRONTEND_URL="http://localhost:5173/getRepo"
 @app.post("/analyze")
 async def analyze_github_repo(data: RepoRequest):
     try:
@@ -38,11 +52,16 @@ async def analyze_github_repo(data: RepoRequest):
         repo_name, REPO_PATH = clone_repo(repo_url)
 
         analysis = directory_traverse(REPO_PATH)
-
+        chunks=create_chunk(REPO_PATH)
+        embedded_chunks=embed_chunks(chunks)
+        searched_chunks=search_chunks("Where is socket connection handled?", embedded_chunks, top_k=5)
+        clean_response_for_searched_chunks=clean_chunks(searched_chunks)
         return {
             "message": "Repo analyzed successfully",
             "repo_name": repo_name,
-            "analysis": analysis
+            "analysis": analysis,
+            "chunks": chunks,
+            "search_results": clean_response_for_searched_chunks
         }
 
     except Exception as e:
@@ -72,6 +91,7 @@ async def chat_with_repo(data: ChatRequest):
             context = selected_file_content(f"repos/{repo_name}", data.selected_files)
         else:
             context = get_imp_file_content(f"repos/{repo_name}")
+        # context=search_chunks(user_query,)
         prompt = build_chat_prompt(context, user_query)
         response = generate_ai_insights(prompt)
         store_chat_history(repo_name, user_query, response)
@@ -110,13 +130,15 @@ def github_callback(code: str):
         },
     )
 
-    print(response.json())  # 👈 ADD THIS
+    token_data = response.json()
+    access_token = token_data.get("access_token")  # 👈 ADD THIS
 
-    return response.json()
+    return   RedirectResponse(f"{FRONTEND_URL}?token={access_token}")
 
 @app.get("/repos")
 def get_all_repos(token: str):
     all_repos = []
+    
     page = 1
 
     while True:
@@ -134,4 +156,6 @@ def get_all_repos(token: str):
         all_repos.extend(data)
         page += 1
 
-    return all_repos
+    only_repo_names=[repo["name"] for repo in all_repos]
+
+    return only_repo_names
