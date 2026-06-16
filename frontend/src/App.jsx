@@ -1,11 +1,13 @@
 import { Routes, Route } from 'react-router-dom'
-import Home from '../pages/Home'
-import AllRepo from '../pages/AllRepo'
+import Home from './pages/Home'
+import AllRepo from './pages/AllRepo'
+import Analysis from './pages/Analysis'
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/getRepo" element={<AllRepo/>} />
+      <Route path="/analysis" element={<Analysis />} />
     </Routes>
   )
 }
