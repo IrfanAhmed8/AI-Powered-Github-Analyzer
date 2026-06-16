@@ -1,17 +1,21 @@
-
 def build_chat_prompt(context, question):
+
     formatted_context = ""
 
-    for file, content in context.items():
-        formatted_context += f"\n\n--- {file} ---\n{content[:1000]}"
+    for i, chunk in enumerate(context):
+        formatted_context += (
+            f"File: {chunk['file_path']}\n"
+            f"{chunk['content']}\n\n"
+        )
 
-    return f"""
+    prompt = f"""
 You are a senior software engineer.
 
-Answer the question based ONLY on the given repository context.
+Answer the question based ONLY on the repository context.
 
 Rules:
-- Be concise (max 5 lines)
+- Be concise
+- Mention file paths
 - Do not hallucinate
 - If not found, say "Not found in the codebase"
 
@@ -21,3 +25,5 @@ Context:
 Question:
 {question}
 """
+
+    return prompt

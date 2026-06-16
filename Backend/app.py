@@ -1,5 +1,6 @@
 import os
 
+from click import prompt
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, HttpUrl
 from service.repo_service import clone_repo
@@ -7,7 +8,7 @@ from service.analyzer import directory_traverse
 from utils.content_utils import get_imp_file_content
 from utils.build_prompt import build_prompt
 from service.gemini_service import generate_ai_insights
-from utils.polish_response import polish_response
+from utils.polish_response import polish_response,polish_chat_response
 from utils.content_utils import get_imp_file_content
 from utils.build_chat_prompt import build_chat_prompt
 from utils.selected_file_content import selected_file_content
@@ -19,8 +20,12 @@ from utils.embed_chunks import embed_chunks
 from utils.search_chunk import search_chunks
 from utils.clean_search_response import clean_chunks
 from fastapi.middleware.cors import CORSMiddleware
-
-
+from utils.save_repo_index import save_repo_index, load_repo_index
+from service.qdrant_service import create_collection
+from service.qdrant_service import upsert_chunks
+from service.qdrant_service import search_chunks_qdrant
+create_collection()
+print("Qdrant collection created successfully")
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -35,7 +40,7 @@ class RepoRequest(BaseModel):
 class ChatRequest(BaseModel):
     repo_name: str
     user_query: str
-    selected_files:list[str] = None
+    
 
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -54,14 +59,14 @@ async def analyze_github_repo(data: RepoRequest):
         analysis = directory_traverse(REPO_PATH)
         chunks=create_chunk(REPO_PATH)
         embedded_chunks=embed_chunks(chunks)
-        searched_chunks=search_chunks("Where is socket connection handled?", embedded_chunks, top_k=5)
-        clean_response_for_searched_chunks=clean_chunks(searched_chunks)
+        upsert_chunks(repo_name, embedded_chunks)
+        # searched_chunks=search_chunks("Where is socket connection handled?", embedded_chunks, top_k=5)
+        # clean_response_for_searched_chunks=clean_chunks(searched_chunks)
         return {
             "message": "Repo analyzed successfully",
             "repo_name": repo_name,
             "analysis": analysis,
-            "chunks": chunks,
-            "search_results": clean_response_for_searched_chunks
+            "chunks": chunks
         }
 
     except Exception as e:
@@ -85,24 +90,29 @@ async def ai_insights(repo_name: str):
 @app.post("/chat")
 async def chat_with_repo(data: ChatRequest):
     try:
-        repo_name = data.repo_name
-        user_query = data.user_query
-        if data.selected_files:
-            context = selected_file_content(f"repos/{repo_name}", data.selected_files)
-        else:
-            context = get_imp_file_content(f"repos/{repo_name}")
-        # context=search_chunks(user_query,)
-        prompt = build_chat_prompt(context, user_query)
+        context = search_chunks_qdrant(data.repo_name, data.user_query, top_k=5)
+
+        print("Loaded chunks:", type(context))
+
+        print("Search completed")
+
+        clean_context = clean_chunks(context)
+
+        print("Clean completed")
+        prompt = build_chat_prompt(clean_context, data.user_query)
+        print(type(prompt))
+        print(prompt)
+        print("Prompt completed")
+
         response = generate_ai_insights(prompt)
-        store_chat_history(repo_name, user_query, response)
-        return {
-            "repo_name": repo_name,
-            "answer": response
-        }
+
+        print("LLM completed")
+        answer = polish_chat_response(response)
+        return {"answer": answer}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
+        print("ERROR:", repr(e))
+        raise
 
 @app.get("/auth/github/login")
 async def github_login():

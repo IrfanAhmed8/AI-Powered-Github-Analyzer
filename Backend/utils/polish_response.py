@@ -19,3 +19,10 @@ def polish_response(response):
         "architecture": architecture,
         "features": features
     }
+
+def polish_chat_response(response):
+    #remove /n,**, * from the response,for every this start from the next line
+    response=response.replace('\n','')
+    response=response.replace('**','')
+    response=response.replace('*','')
+    return response.strip()

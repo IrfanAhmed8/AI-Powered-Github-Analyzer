@@ -19,7 +19,17 @@ def embed_chunks(chunks):
     embedded_chunks = []
 
     for chunk in chunks:
-        embedding = get_embedding(chunk["content"])
+
+        embedding_text = f"""
+File Path: {chunk['file_path']}
+File Name: {chunk['file_name']}
+Language: {chunk['language']}
+
+Code:
+{chunk['content']}
+"""
+
+        embedding = get_embedding(embedding_text)
 
         chunk_with_embedding = {
             **chunk,

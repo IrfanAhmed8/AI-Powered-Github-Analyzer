@@ -1,5 +1,7 @@
 import os
 from utils.chunk_file import chunk_file
+from service.gemini_service import generate_ai_insights
+from utils.polish_response import polish_response
 def create_chunk(repo_path):
     chunks = []
     VALID_EXTENSIONS = {".py", ".js", ".java", ".jsx", ".cpp", ".c", ".rb", ".go", ".ts",".md",".css",".html"}
@@ -24,6 +26,11 @@ def create_chunk(repo_path):
                     content= f.read()
             except Exception as e:
                 continue
+            summary = f"""
+            File: {os.path.basename(file_path)}
+            Path: {os.path.relpath(file_path, repo_path)}
+            Language: {ext}
+            """
             file_chunks=chunk_file(content)
             for i, chunk in enumerate(file_chunks):
                 chunks.append({
@@ -31,7 +38,8 @@ def create_chunk(repo_path):
                     "file_path": os.path.relpath(file_path, repo_path),
                     "file_name": os.path.basename(file_path),
                     "chunk_id": f"{os.path.basename(file_path)}_{i}",
-                    "language": ext
+                    "language": ext,
+                    "summary": summary
                 })
 
     return chunks
