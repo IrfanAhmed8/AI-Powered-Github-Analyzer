@@ -20,7 +20,7 @@ Built an AI-powered GitHub Repository Analyzer using React, FastAPI, Gemini, and
 
 ---
 
-## 🚀 Overview
+## Overview
 
 **AI-Powered GitHub Repository Analyzer** is an intelligent system that enables semantic understanding and analysis of GitHub repositories through advanced AI and vector databases. It combines Retrieval-Augmented Generation (RAG) with Google's Gemini AI to provide context-aware, repository-specific answers about codebases.
 
@@ -43,7 +43,7 @@ Built an AI-powered GitHub Repository Analyzer using React, FastAPI, Gemini, and
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 ### Core Capabilities
 
@@ -70,21 +70,16 @@ Built an AI-powered GitHub Repository Analyzer using React, FastAPI, Gemini, and
 
 ---
 
-## 🏛️ Architecture
+## Architecture
 ![Project Screenshot](images/Architecture.png)
 
 ### Pipeline Steps
 
-1. **Question Embedding**: User question converted to 384-dimensional vector
-2. **Semantic Search**: Qdrant finds semantically similar code chunks
-3. **Context Retrieval**: Top matching chunks ranked and retrieved
-4. **Prompt Engineering**: Context formatted with question for LLM
-5. **LLM Generation**: Gemini generates repository-aware response
-6. **Response Streaming**: Real-time response streaming to user
+![Project Screenshot](images/RAG.png)
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React 18+** - Modern UI framework
@@ -110,11 +105,11 @@ Built an AI-powered GitHub Repository Analyzer using React, FastAPI, Gemini, and
 ### Data Processing
 - **AST Parsing** - Code structure analysis
 - **PyGithub** - GitHub integration
-- **Langchain** - LLM orchestration
+- 
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 
@@ -197,7 +192,7 @@ docker-compose up --build
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -263,7 +258,7 @@ docker run -p 6333:6333 -p 6334:6334 \
 
 ---
 
-## 🎯 Usage
+## Usage
 
 ### Step 1: Authentication
 - Click "Login with GitHub"
@@ -318,7 +313,7 @@ See [API Documentation](http://localhost:8000/docs) for detailed endpoint specif
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 AI-Powered-Github-Analyzer/
@@ -354,7 +349,7 @@ AI-Powered-Github-Analyzer/
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 ### 1. Repository Analysis Phase
 - Repository is cloned from GitHub
@@ -389,7 +384,7 @@ AI-Powered-Github-Analyzer/
 
 ---
 
-## 🔮 Future Improvements
+## Future Improvements
 
 ### Planned Features
 
@@ -436,7 +431,7 @@ AI-Powered-Github-Analyzer/
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### Authentication
 ![GitHub OAuth Login](./screenshots/login.png)
@@ -455,7 +450,7 @@ AI-Powered-Github-Analyzer/
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -482,13 +477,8 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📝 License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Google Gemini API](https://ai.google.dev/) for LLM capabilities
 - [Qdrant](https://qdrant.tech/) for vector database
@@ -499,14 +489,11 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ---
 
-## 📞 Support
+## Support
 
 For questions and support:
 
-- 📧 Email: support@example.com
-- 💬 GitHub Discussions: [Discussions](https://github.com/yourusername/AI-Powered-Github-Analyzer/discussions)
-- 🐛 Bug Reports: [Issues](https://github.com/yourusername/AI-Powered-Github-Analyzer/issues)
-- 📖 Documentation: [Wiki](https://github.com/yourusername/AI-Powered-Github-Analyzer/wiki)
+- 📧 Email: jafriirfan37@gmail.com
 
 ---
 
